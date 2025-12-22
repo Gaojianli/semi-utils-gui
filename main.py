@@ -770,6 +770,8 @@ class Backend(QObject):
     def openOutputDir(self):
         """打开输出目录"""
         output_dir = self._config.get_output_dir()
+        # 转换为绝对路径
+        output_dir = os.path.abspath(output_dir)
         if os.path.exists(output_dir):
             import subprocess
             import platform
@@ -777,7 +779,7 @@ class Backend(QObject):
             if platform.system() == "Darwin":
                 subprocess.run(["open", output_dir])
             elif platform.system() == "Windows":
-                subprocess.run(["explorer", output_dir])
+                os.startfile(output_dir)
             else:
                 subprocess.run(["xdg-open", output_dir])
 
