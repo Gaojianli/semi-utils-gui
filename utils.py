@@ -1,27 +1,197 @@
 import logging
-import platform
-import re
-import shutil
-import subprocess
 from pathlib import Path
 
+import exifread
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageOps
 
 from enums.constant import TRANSPARENT
 
-if platform.system() == 'Windows':
-    EXIFTOOL_PATH = Path('./exiftool/exiftool.exe')
-    ENCODING = 'gbk'
-elif shutil.which('exiftool') is not None:
-    EXIFTOOL_PATH = shutil.which('exiftool')
-    ENCODING = 'utf-8'
-else:
-    EXIFTOOL_PATH = Path('./exiftool/exiftool')
-    ENCODING = 'utf-8'
-
 logger = logging.getLogger(__name__)
+
+
+def get_exif(path) -> dict:
+    """
+    使用 exifread 获取 EXIF 信息
+    :param path: 照片路径
+    :return: exif 信息字典
+    """
+    exif_dict = {}
+    try:
+        with open(path, 'rb') as f:
+            tags = exifread.process_file(f, details=False)
+
+        # 映射 exifread 标签到我们需要的格式
+        tag_mapping = {
+            # 相机信息
+            'Image Make': 'Make',
+            'Image Model': 'CameraModelName',
+            # 镜头信息
+            'EXIF LensModel': 'LensModel',
+            'EXIF LensInfo': 'Lens',
+            'EXIF LensMake': 'LensMake',
+            # 拍摄参数
+            'EXIF DateTimeOriginal': 'DateTimeOriginal',
+            'EXIF FocalLength': 'FocalLength',
+            'EXIF FocalLengthIn35mmFilm': 'FocalLengthIn35mmFormat',
+            'EXIF FNumber': 'FNumber',
+            'EXIF ISOSpeedRatings': 'ISO',
+            'EXIF ExposureTime': 'ExposureTime',
+            'EXIF ShutterSpeedValue': 'ShutterSpeedValue',
+            # 方向
+            'Image Orientation': 'Orientation',
+            # GPS
+            'GPS GPSLatitude': 'GPSLatitude',
+            'GPS GPSLongitude': 'GPSLongitude',
+            'GPS GPSLatitudeRef': 'GPSLatitudeRef',
+            'GPS GPSLongitudeRef': 'GPSLongitudeRef',
+        }
+
+        for exif_tag, our_tag in tag_mapping.items():
+            if exif_tag in tags:
+                value = tags[exif_tag]
+                # 转换值为字符串
+                str_value = str(value)
+
+                # 特殊处理某些字段
+                if our_tag == 'FocalLength':
+                    # 处理焦距格式 "50" 或 "50/1"
+                    str_value = _format_focal_length(value)
+                elif our_tag == 'FocalLengthIn35mmFormat':
+                    str_value = str(value)
+                elif our_tag == 'FNumber':
+                    # 处理光圈值
+                    str_value = _format_fnumber(value)
+                elif our_tag == 'ExposureTime':
+                    # 处理曝光时间
+                    str_value = _format_exposure_time(value)
+                elif our_tag == 'Orientation':
+                    # 处理方向
+                    str_value = _format_orientation(value)
+                elif our_tag in ['GPSLatitude', 'GPSLongitude']:
+                    # 处理 GPS 坐标
+                    ref_tag = exif_tag + 'Ref'
+                    ref = str(tags.get(ref_tag, '')) if ref_tag.replace('GPS GPS', 'GPS ') in tags else ''
+                    str_value = _format_gps_coordinate(value, ref)
+
+                exif_dict[our_tag] = str_value
+
+        # 处理 GPS Position (组合)
+        if 'GPSLatitude' in exif_dict and 'GPSLongitude' in exif_dict:
+            lat_ref = str(tags.get('GPS GPSLatitudeRef', 'N'))
+            lon_ref = str(tags.get('GPS GPSLongitudeRef', 'E'))
+            lat = _format_gps_for_position(tags.get('GPS GPSLatitude'), lat_ref)
+            lon = _format_gps_for_position(tags.get('GPS GPSLongitude'), lon_ref)
+            if lat and lon:
+                exif_dict['GPSPosition'] = f"{lat}, {lon}"
+
+    except Exception as e:
+        logger.error(f'get_exif error: {path} : {e}')
+
+    return exif_dict
+
+
+def _format_focal_length(value) -> str:
+    """格式化焦距值"""
+    try:
+        # exifread 返回的值可能是 Ratio 对象
+        if hasattr(value, 'values') and len(value.values) > 0:
+            ratio = value.values[0]
+            if hasattr(ratio, 'num') and hasattr(ratio, 'den'):
+                focal = ratio.num / ratio.den if ratio.den != 0 else ratio.num
+                return f"{focal:.1f}"
+        return str(value).split()[0]
+    except Exception:
+        return str(value)
+
+
+def _format_fnumber(value) -> str:
+    """格式化光圈值"""
+    try:
+        if hasattr(value, 'values') and len(value.values) > 0:
+            ratio = value.values[0]
+            if hasattr(ratio, 'num') and hasattr(ratio, 'den'):
+                f_num = ratio.num / ratio.den if ratio.den != 0 else ratio.num
+                return f"{f_num:.1f}"
+        # 尝试从字符串解析
+        str_val = str(value)
+        if '/' in str_val:
+            parts = str_val.split('/')
+            return f"{int(parts[0]) / int(parts[1]):.1f}"
+        return str_val
+    except Exception:
+        return str(value)
+
+
+def _format_exposure_time(value) -> str:
+    """格式化曝光时间"""
+    try:
+        if hasattr(value, 'values') and len(value.values) > 0:
+            ratio = value.values[0]
+            if hasattr(ratio, 'num') and hasattr(ratio, 'den'):
+                if ratio.den > ratio.num and ratio.num > 0:
+                    # 分数形式，如 1/1000
+                    return f"1/{int(ratio.den / ratio.num)}"
+                else:
+                    # 秒形式
+                    exp = ratio.num / ratio.den if ratio.den != 0 else ratio.num
+                    if exp >= 1:
+                        return f"{exp:.0f}"
+                    else:
+                        return f"1/{int(1/exp)}"
+        return str(value)
+    except Exception:
+        return str(value)
+
+
+def _format_orientation(value) -> str:
+    """格式化方向值"""
+    orientation_map = {
+        '1': 'Rotate 0',
+        'Horizontal (normal)': 'Rotate 0',
+        '3': 'Rotate 180',
+        'Rotated 180': 'Rotate 180',
+        '6': 'Rotate 90 CW',
+        'Rotated 90 CW': 'Rotate 90 CW',
+        '8': 'Rotate 270 CW',
+        'Rotated 90 CCW': 'Rotate 270 CW',
+    }
+    str_val = str(value)
+    return orientation_map.get(str_val, 'Rotate 0')
+
+
+def _format_gps_coordinate(value, ref) -> str:
+    """格式化 GPS 坐标"""
+    try:
+        if hasattr(value, 'values') and len(value.values) >= 3:
+            degrees = _ratio_to_float(value.values[0])
+            minutes = _ratio_to_float(value.values[1])
+            seconds = _ratio_to_float(value.values[2])
+            return f"{int(degrees)} deg {int(minutes)}' {seconds:.2f}\" {ref}"
+    except Exception:
+        pass
+    return str(value)
+
+
+def _format_gps_for_position(value, ref) -> str:
+    """格式化 GPS 坐标用于 GPSPosition"""
+    try:
+        if hasattr(value, 'values') and len(value.values) >= 3:
+            degrees = _ratio_to_float(value.values[0])
+            minutes = _ratio_to_float(value.values[1])
+            seconds = _ratio_to_float(value.values[2])
+            return f"{int(degrees)} deg {int(minutes)}' {seconds:.2f}\" {ref}"
+    except Exception:
+        pass
+    return ""
+
+
+def _ratio_to_float(ratio) -> float:
+    """将 Ratio 对象转换为浮点数"""
+    if hasattr(ratio, 'num') and hasattr(ratio, 'den'):
+        return ratio.num / ratio.den if ratio.den != 0 else float(ratio.num)
+    return float(ratio)
 
 
 def get_file_list(path):
@@ -32,57 +202,7 @@ def get_file_list(path):
     """
     path = Path(path)
     return [file_path for file_path in path.iterdir()
-            if file_path.is_file() and file_path.suffix in ['.jpg', '.jpeg', '.JPG', '.JPEG', '.png', '.PNG']]
-
-
-def get_exif(path) -> dict:
-    """
-    获取exif信息
-    :param path: 照片路径
-    :return: exif信息
-    """
-    exif_dict = {}
-    try:
-        output_bytes = subprocess.check_output([EXIFTOOL_PATH, '-d', '%Y-%m-%d %H:%M:%S%3f%z', path])
-        output = output_bytes.decode('utf-8', errors='ignore')
-
-        lines = output.splitlines()
-        utf8_lines = [line for line in lines]
-
-        for line in utf8_lines:
-            # 将每一行按冒号分隔成键值对
-            kv_pair = line.split(':')
-            if len(kv_pair) < 2:
-                continue
-            key = kv_pair[0].strip()
-            value = ':'.join(kv_pair[1:]).strip()
-            # 将键中的空格移除
-            key = re.sub(r'\s+', '', key)
-            key = re.sub(r'/', '', key)
-            # 将键值对添加到字典中
-            exif_dict[key] = value
-        for key, value in exif_dict.items():
-            # 过滤非 ASCII 字符
-            value_clean = ''.join(c for c in value if ord(c) < 128)
-            # 将处理后的值更新到 exif_dict 中
-            exif_dict[key] = value_clean
-    except Exception as e:
-        logger.error(f'get_exif error: {path} : {e}')
-
-    return exif_dict
-
-
-def insert_exif(source_path, target_path) -> None:
-    """
-    复制照片的 exif 信息
-    :param source_path: 源照片路径
-    :param target_path: 目的照片路径
-    """
-    try:
-        # 将 exif 信息转换为字节串
-        subprocess.check_output([EXIFTOOL_PATH, '-tagsfromfile', source_path, '-overwrite_original', target_path])
-    except ValueError as e:
-        logger.exception(f'ValueError: {source_path}: cannot insert exif {str(e)}')
+            if file_path.is_file() and file_path.suffix.lower() in ['.jpg', '.jpeg', '.png']]
 
 
 TINY_HEIGHT = 800
@@ -380,21 +500,18 @@ def extract_attribute(data_dict: dict, *keys, default_value: str = '', prefix=''
     return default_value
 
 
-def extract_gps_lat_and_long(lat: str, long: str):
-    # 提取出纬度和经度主要部分
-    lat_deg, _, lat_min = re.findall(r"(\d+ deg \d+)", lat)[0].split()
-    long_deg, _, long_min = re.findall(r"(\d+ deg \d+)", long)[0].split()
-
-    # 提取出方向（北 / 南 / 东 / 西）
-    lat_dir = re.findall(r"([NS])", lat)[0]
-    long_dir = re.findall(r"([EW])", long)[0]
-
-    latitude = f"{lat_deg}°{lat_min}'{lat_dir}"
-    longitude = f"{long_deg}°{long_min}'{long_dir}"
-
-    return latitude, longitude
+def extract_gps_lat_and_long(coords):
+    """从元组中提取纬度和经度"""
+    if isinstance(coords, tuple) and len(coords) == 2:
+        lat, long = coords
+        return lat, long
+    return '', ''
 
 
 def extract_gps_info(gps_info: str):
-    lat, long = gps_info.split(", ")
-    return extract_gps_lat_and_long(lat, long)
+    """从 GPSPosition 字符串中提取纬度和经度"""
+    try:
+        lat, long = gps_info.split(", ")
+        return lat, long
+    except Exception:
+        return '', ''

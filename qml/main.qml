@@ -162,10 +162,12 @@ ApplicationWindow {
 
                     // 布局设置页
                     ScrollView {
+                        id: layoutScrollView
                         clip: true
+                        contentWidth: availableWidth
 
                         ColumnLayout {
-                            width: parent.width
+                            width: layoutScrollView.availableWidth
                             spacing: 16
 
                             Pane {
@@ -334,10 +336,12 @@ ApplicationWindow {
 
                     // 文字设置页
                     ScrollView {
+                        id: textScrollView
                         clip: true
+                        contentWidth: availableWidth
 
                         ColumnLayout {
-                            width: parent.width
+                            width: textScrollView.availableWidth
                             spacing: 8
 
                             Repeater {
@@ -404,10 +408,12 @@ ApplicationWindow {
 
                     // 效果设置页
                     ScrollView {
+                        id: effectsScrollView
                         clip: true
+                        contentWidth: availableWidth
 
                         ColumnLayout {
-                            width: parent.width
+                            width: effectsScrollView.availableWidth
                             spacing: 16
 
                             Pane {

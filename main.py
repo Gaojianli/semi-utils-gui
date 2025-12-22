@@ -43,6 +43,26 @@ LAYOUT_NAME_KEYS = {
     "白色边框": "layout_white_border",
 }
 
+# 文字选项 value 到翻译 key 的映射
+TEXT_ITEM_KEYS = {
+    "Model": "text_model",
+    "Make": "text_make",
+    "LensModel": "text_lens",
+    "Param": "text_param",
+    "Datetime": "text_datetime",
+    "Date": "text_date",
+    "Custom": "text_custom",
+    "None": "text_none",
+    "LensMake_LensModel": "text_lens_make_lens_model",
+    "CameraModel_LensModel": "text_camera_model_lens_model",
+    "TotalPixel": "text_total_pixel",
+    "CameraMake_CameraModel": "text_camera_make_camera_model",
+    "Filename": "text_filename",
+    "Date_Filename": "text_date_filename",
+    "Datetime_Filename": "text_datetime_filename",
+    "GeoInfo": "text_geo_info",
+}
+
 
 class PreviewWorker(QThread):
     """预览生成工作线程"""
@@ -262,6 +282,9 @@ class Backend(QObject):
         }
         self._load_text_indices()
 
+        # 启动时自动刷新文件列表
+        QTimer.singleShot(100, self.refreshFileList)
+
     def _load_text_indices(self):
         """加载文字位置索引"""
         for key in self._text_indices.keys():
@@ -346,7 +369,14 @@ class Backend(QObject):
     # ===== 文字设置 =====
     @Property(list, notify=textItemsChanged)
     def textItems(self):
-        return [item.name for item in ITEM_LIST]
+        result = []
+        for item in ITEM_LIST:
+            key = TEXT_ITEM_KEYS.get(item.value)
+            if key and key in self._translations:
+                result.append(self._translations[key])
+            else:
+                result.append(item.name)
+        return result
 
     @Property(int, constant=True)
     def customTextIndex(self):
@@ -644,6 +674,7 @@ class Backend(QObject):
             self._config.save()
             self.languageChanged.emit()
             self.layoutItemsChanged.emit()  # 更新布局选项翻译
+            self.textItemsChanged.emit()  # 更新文字选项翻译
             self._update_dynamic_texts()
 
     @Slot(str, result=str)
