@@ -25,10 +25,24 @@ jobs:
         uv sync
         uv add pyinstaller
 
-    - name: Download exiftool
+    - name: Download exiftool from official site
       run: |
+        # Download exiftool Windows executable from official site
+        $exiftoolUrl = "https://exiftool.org/exiftool-13.10_64.zip"
+        $zipFile = "exiftool.zip"
+        Invoke-WebRequest -Uri $exiftoolUrl -OutFile $zipFile
+
+        # Create directory and extract
         New-Item -Path "./exiftool" -ItemType "directory" -Force | Out-Null
-        Invoke-WebRequest -Uri "https://github.com/Gaojianli/semi-utils-gui/raw/exiftool/exiftool/exiftool.exe" -OutFile "./exiftool/exiftool.exe"
+        Expand-Archive -Path $zipFile -DestinationPath "./exiftool" -Force
+
+        # Rename exiftool(-k).exe to exiftool.exe
+        Get-ChildItem -Path "./exiftool" -Filter "exiftool*.exe" | ForEach-Object {
+          Rename-Item -Path $_.FullName -NewName "exiftool.exe"
+        }
+
+        # Clean up
+        Remove-Item $zipFile
 
     - name: Build Executable
       run: |
