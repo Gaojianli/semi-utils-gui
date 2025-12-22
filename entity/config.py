@@ -151,8 +151,8 @@ class Config(object):
         return bold_font_size + font_size
 
     def save(self):
-        with open(self._path, 'w') as f:
-            yaml.dump(self._data, f, encoding='utf-8')
+        with open(self._path, 'w', encoding='utf-8') as f:
+            yaml.dump(self._data, f, allow_unicode=True)
 
     def enable_shadow(self):
         self._data['global']['shadow']['enable'] = True

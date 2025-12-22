@@ -1,19 +1,10 @@
 # semi-utils
 
-> [![hugo-papermod](https://img.shields.io/badge/Semi--Utils-@LeslieVan-red)](https://github.com/leslievan/semi-utils)
-> [![download](https://img.shields.io/github/downloads/leslievan/semi-utils/total.svg)](https://github.com/leslievan/semit-utils/releases)
-> [![release](https://img.shields.io/github/v/release/leslievan/semi-utils)](https://github.com/leslievan/semi-utils/releases)
-> [![license](https://img.shields.io/github/license/leslievan/semi-utils)](https://github.com/leslievan/semi-utils/blob/master/LICENSE)
-> ![language](https://img.shields.io/github/languages/top/leslievan/semi-utils?color=orange)
->
+[English](README.en.md)
+
 > **这是一个用于给照片批量添加水印、处理照片像素比、图像色彩和质量的工具。**
 
-如果您觉得程序对您有所帮助的话，可以点击 [Sponsor](https://cdn.lsvm.xyz/wechat.jpg) 按钮请作者喝杯咖啡，谢谢！
-
-
-## 开发文档
-
-**[Wiki](../../wiki)**
+感谢原始开发者 [leslievan](https://github.com/leslievan/semi-utils)，本项目在其基础上增加了一个GUI
 
 ## 效果展示
 
@@ -28,16 +19,13 @@
 
 > **简要步骤**
 >
-> ![](images/steps.png)
+> ![](images/usage.png)
 
 ### Windows
 
-- 点击[Release](https://github.com/leslievan/semi-utils/releases) 可直接下载压缩包，其中包含可执行文件 `main.exe`、配置文件 `config.yaml`、输入文件夹 `input` 和输出文件夹 `output`。
+- 点击[Release](https://github.com/Gaojianli/semi-utils-gui/releases) 可直接下载压缩包，其中包含可执行文件 `main.exe`、配置文件 `config.yaml`、输入文件夹 `input` 和输出文件夹 `output`。
 - 解压压缩包，比如解压到 `D:\semi-utils`
-- 将需要添加水印的图片复制到 `D:\semi-utils\input` 文件夹中
 - 双击 `D:\semi-utils\main.exe` 运行程序
-- 按照提示输入 `y或回车` 开始执行
-- 处理好的图片存放在 `D:\semi-utils\output` 中
 
 ---
 
@@ -51,7 +39,7 @@
 
   ```shell
   # 使用 git 将代码下载到本地，比如 ~/semi-utils，如果要下载到其他路径替换掉下面命令中的路径即可
-  git clone --depth 1 https://github.com/leslievan/semi-utils.git ~/semi-utils
+  git clone --depth 1 https://github.com/Gaojianli/semi-utils-gui.git ~/semi-utils
   cd ~/semi-utils
   chmod +x install.sh
   ./install.sh
@@ -70,48 +58,7 @@
    python3 ~/semi-utils/main.py
    ```
 
-- 按照提示输入 `y或回车` 开始执行
-
-- 处理好的图片存放在 `~/semi-utils/output` 中
-
-#### 手动下载
-
-<details>
-<summary>点击展开</summary>
-
-- 下载[源码](http://file.lsvm.xyz/semi-utils-latest-source.zip)后解压，比如解压到 `~/semi-utils`，路径需要自行替换。
-
-   > 你可以右键单击解压后的文件夹，按住 Opt 键-选择将xxx拷贝为路径名称 ，用剪贴板中的实际路径替换下面命令中的 `~/semi-utils`.
-
-- **安装需要的依赖（正式运行前执行一次即可）**
-
-   打开命令行/终端，输入：
-
-   ```shell
-   cd ~/semi-utils
-   chmod +x install.sh
-   ./install.sh
-   ```
-
-   > 你可以按下 command+空格键，打开 Spotlight 搜索栏，在搜索栏中输入 `终端` 即可。
-   >
-   > 如果命令运行出错可以参考 [常见问题](#常见问题)。
-
-- 将需要添加水印的图片复制到 `~/semi-utils/input` 文件夹中
-
-- 打开命令行/终端，输入
-
-   ```shell
-   cd ~/semi-utils
-   python3 ~/semi-utils/main.py
-   ```
-
-- 按照提示输入 `y或回车` 开始执行
-
-- 处理好的图片存放在 `~/semi-utils/output` 中
-
-
-</details>
+- 参照GUI操作
 
 ## 配置项
 
@@ -303,9 +250,7 @@ python3 --version
 
 ## 特别感谢
 
-![JetBrains](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png)
-
-感谢 [JetBrains](https://jb.gg/OpenSourceSupport) 为本项目提供的开源许可。
+[Claude](https://claude.com/product/claude-code) 创建了GUI界面.
 
 ## 许可证
 
@@ -315,4 +260,4 @@ Semi-Utils 引用了 [exiftool](https://exiftool.org/)，其发布基于 [GPL v1
 
 ## 关于
 
-[![Stargazers over time](https://starchart.cc/leslievan/semi-utils.svg)](https://starchart.cc/leslievan/semi-utils)
+[![Stargazers over time](https://starchart.cc/Gaojianli/semi-utils-gui.svg)](https://starchart.cc/Gaojianli/semi-utils-gui)

@@ -11,4 +11,4 @@ Expand-Archive -Path Image-ExifTool-12.85.tar.gz -DestinationPath exiftool -Forc
 Remove-Item Image-ExifTool-12.85.tar.gz
 
 # 下载 python 依赖
-pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+uv sync
