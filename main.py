@@ -808,8 +808,14 @@ def main():
     # 将后端暴露给 QML
     engine.rootContext().setContextProperty("backend", backend)
 
-    # 加载 QML
-    qml_file = Path(__file__).parent / "qml" / "main.qml"
+    # 加载 QML (支持 PyInstaller 打包)
+    if getattr(sys, 'frozen', False):
+        # 打包后的路径
+        base_path = Path(sys._MEIPASS)
+    else:
+        # 开发环境路径
+        base_path = Path(__file__).parent
+    qml_file = base_path / "qml" / "main.qml"
     engine.load(qml_file)
 
     if not engine.rootObjects():

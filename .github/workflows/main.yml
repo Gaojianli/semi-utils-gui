@@ -36,7 +36,6 @@ jobs:
         Move-Item -Path "./input" -Destination "./dist/semi-utils"
         Move-Item -Path "./logos" -Destination "./dist/semi-utils"
         Move-Item -Path "./fonts" -Destination "./dist/semi-utils"
-        Move-Item -Path "./qml" -Destination "./dist/semi-utils"
         Move-Item -Path "./config.yaml" -Destination "./dist/semi-utils/config.yaml"
 
     - name: Upload Artifact
