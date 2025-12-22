@@ -34,11 +34,11 @@ jobs:
 
     - name: Add Release Resource to Package
       run: |
-        Move-Item -Path "./input" -Destination "./dist"
-        Move-Item -Path "./logos" -Destination "./dist"
-        Move-Item -Path "./fonts" -Destination "./dist"
-        Move-Item -Path "./qml" -Destination "./dist"
-        Move-Item -Path "./config.yaml" -Destination "./dist/config.yaml"
+        Move-Item -Path "./input" -Destination "./dist/semi-utils"
+        Move-Item -Path "./logos" -Destination "./dist/semi-utils"
+        Move-Item -Path "./fonts" -Destination "./dist/semi-utils"
+        Move-Item -Path "./qml" -Destination "./dist/semi-utils"
+        Move-Item -Path "./config.yaml" -Destination "./dist/semi-utils/config.yaml"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v6
