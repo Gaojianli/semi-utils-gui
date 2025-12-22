@@ -8,7 +8,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('./qml', './qml')],
+    datas=[('./src/layout', './src/layout')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
