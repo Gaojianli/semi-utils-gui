@@ -1,10 +1,9 @@
 name: Build Windows Release Package
 
 on:
-  pull_request:
-  push:
-    tags:
-      - 'build*' # Push events to matching build* tags
+  release:
+    types:
+      - published
 
 jobs:
   build:
@@ -17,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.10'
+        python-version: '3.14'
 
     - name: Install uv
       uses: astral-sh/setup-uv@v7
@@ -38,7 +37,7 @@ jobs:
         Move-Item -Path "./fonts" -Destination "./dist"
         Move-Item -Path "./config.yaml" -Destination "./dist/config.yaml"
         New-Item -Path "./dist/exiftool" -ItemType "directory" -Force | Out-Null
-        Invoke-WebRequest -Uri "https://github.com/leslievan/semi-utils/raw/exiftool/exiftool/exiftool.exe" -OutFile "./dist/exiftool/exiftool.exe"
+        Invoke-WebRequest -Uri "https://github.com/Gaojianli/semi-utils-gui/raw/exiftool/exiftool/exiftool.exe" -OutFile "./dist/exiftool/exiftool.exe"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2

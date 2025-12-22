@@ -1,10 +1,8 @@
 name: Build
 
 on:
-  pull_request:
   push:
-    tags:
-      - 'build*' # Push events to matching build* tags
+  workflow_dispatch:
 
 jobs:
   build:
@@ -19,16 +17,23 @@ jobs:
       with:
         python-version: '3.14'
 
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.14'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+
     - name: Install Dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pyinstaller
+        uv sync
+        uv add pyinstaller
 
     - name: Download exiftool
       run: |
         New-Item -Path "./exiftool" -ItemType "directory" -Force | Out-Null
-        Invoke-WebRequest -Uri "https://github.com/leslievan/semi-utils/raw/exiftool/exiftool/exiftool.exe" -OutFile "./exiftool/exiftool.exe"
+        Invoke-WebRequest -Uri "https://github.com/Gaojianli/semi-utils-gui/raw/exiftool/exiftool/exiftool.exe" -OutFile "./exiftool/exiftool.exe"
 
     - name: Build Executable
       run: |
