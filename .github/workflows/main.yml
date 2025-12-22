@@ -10,15 +10,10 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v6
 
     - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.14'
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v6
       with:
         python-version: '3.14'
 
@@ -40,7 +35,7 @@ jobs:
         pyinstaller main.spec
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v6
       with:
         name: semi-utils-latest
         path: dist
