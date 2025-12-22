@@ -779,32 +779,157 @@ ApplicationWindow {
 
                         // 预览图片
                         Rectangle {
+                            id: previewContainer
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             color: "#2d2d2d"
+                            clip: true
 
-                            Image {
-                                id: previewImage
+                            property real imageScale: 1.0
+                            property real minScale: 0.5
+                            property real maxScale: 5.0
+                            property real imageOffsetX: 0
+                            property real imageOffsetY: 0
+
+                            // 重置缩放和位置
+                            function resetView() {
+                                imageScale = 1.0
+                                imageOffsetX = 0
+                                imageOffsetY = 0
+                            }
+
+                            // 图片容器，用于拖拽
+                            Item {
+                                id: imageWrapper
                                 anchors.fill: parent
                                 anchors.margins: 16
-                                fillMode: Image.PreserveAspectFit
-                                source: backend ? backend.previewImage : ""
-                                asynchronous: true
-                                cache: false
 
-                                BusyIndicator {
+                                Image {
+                                    id: previewImage
                                     anchors.centerIn: parent
-                                    running: backend ? backend.previewLoading : false
-                                    Material.accent: Material.Teal
+                                    anchors.horizontalCenterOffset: previewContainer.imageOffsetX
+                                    anchors.verticalCenterOffset: previewContainer.imageOffsetY
+                                    width: parent.width
+                                    height: parent.height
+                                    fillMode: Image.PreserveAspectFit
+                                    source: backend ? backend.previewImage : ""
+                                    asynchronous: true
+                                    cache: false
+                                    scale: previewContainer.imageScale
+                                    transformOrigin: Item.Center
+
+                                    // 图片加载完成后重置视图
+                                    onStatusChanged: {
+                                        if (status === Image.Ready) {
+                                            previewContainer.resetView()
+                                        }
+                                    }
                                 }
 
-                                Label {
-                                    anchors.centerIn: parent
-                                    text: backend ? backend.previewMessage : ""
-                                    color: "#aaaaaa"
-                                    visible: previewImage.status !== Image.Ready && !(backend && backend.previewLoading)
-                                    horizontalAlignment: Text.AlignHCenter
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    property real lastX: 0
+                                    property real lastY: 0
+
+                                    // 拖拽
+                                    onPressed: function(event) {
+                                        lastX = event.x
+                                        lastY = event.y
+                                        cursorShape = Qt.ClosedHandCursor
+                                    }
+
+                                    onReleased: {
+                                        cursorShape = Qt.OpenHandCursor
+                                    }
+
+                                    onPositionChanged: function(event) {
+                                        if (pressed) {
+                                            var dx = event.x - lastX
+                                            var dy = event.y - lastY
+                                            previewContainer.imageOffsetX += dx
+                                            previewContainer.imageOffsetY += dy
+                                            lastX = event.x
+                                            lastY = event.y
+                                        }
+                                    }
+
+                                    // 双击重置
+                                    onDoubleClicked: {
+                                        previewContainer.resetView()
+                                    }
+
+                                    // 滚轮缩放 - 以鼠标位置为中心
+                                    onWheel: function(event) {
+                                        var delta = event.angleDelta.y / 120
+                                        var scaleFactor = 1.0 + delta * 0.15
+                                        var oldScale = previewContainer.imageScale
+                                        var newScale = oldScale * scaleFactor
+
+                                        // 限制缩放范围
+                                        newScale = Math.max(previewContainer.minScale, Math.min(previewContainer.maxScale, newScale))
+
+                                        if (newScale !== oldScale) {
+                                            // 鼠标相对于图片中心的位置
+                                            var centerX = imageWrapper.width / 2 + previewContainer.imageOffsetX
+                                            var centerY = imageWrapper.height / 2 + previewContainer.imageOffsetY
+
+                                            // 鼠标位置相对于图片中心的偏移
+                                            var mouseOffsetX = event.x - centerX
+                                            var mouseOffsetY = event.y - centerY
+
+                                            // 缩放比例变化
+                                            var scaleChange = newScale / oldScale
+
+                                            // 调整偏移，使鼠标指向的点保持不变
+                                            previewContainer.imageOffsetX -= mouseOffsetX * (scaleChange - 1)
+                                            previewContainer.imageOffsetY -= mouseOffsetY * (scaleChange - 1)
+
+                                            previewContainer.imageScale = newScale
+                                        }
+                                    }
+
+                                    cursorShape: Qt.OpenHandCursor
                                 }
+                            }
+
+                            // 加载指示器
+                            BusyIndicator {
+                                anchors.centerIn: parent
+                                running: backend ? backend.previewLoading : false
+                                Material.accent: Material.Teal
+                            }
+
+                            // 提示文字
+                            Label {
+                                anchors.centerIn: parent
+                                text: backend ? backend.previewMessage : ""
+                                color: "#aaaaaa"
+                                visible: previewImage.status !== Image.Ready && !(backend && backend.previewLoading)
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+
+                            // 缩放提示标签
+                            Label {
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+                                anchors.margins: 8
+                                text: Math.round(previewContainer.imageScale * 100) + "%"
+                                color: "#888888"
+                                font.pixelSize: 12
+                                visible: previewImage.status === Image.Ready
+                            }
+
+                            // 重置按钮
+                            Button {
+                                anchors.left: parent.left
+                                anchors.bottom: parent.bottom
+                                anchors.margins: 8
+                                text: "1:1"
+                                flat: true
+                                visible: previewImage.status === Image.Ready && (previewContainer.imageScale !== 1.0 || previewContainer.imageOffsetX !== 0 || previewContainer.imageOffsetY !== 0)
+                                onClicked: previewContainer.resetView()
+                                Material.foreground: "#888888"
                             }
                         }
                     }
