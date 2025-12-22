@@ -9,3 +9,5 @@ exiftool
 build
 dist
 logs
+.vscode/
+.claude

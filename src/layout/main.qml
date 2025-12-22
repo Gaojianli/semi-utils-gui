@@ -378,12 +378,14 @@ ApplicationWindow {
                                         Label {
                                             text: window.tr("default_logo")
                                             font.pixelSize: 12
+                                            visible: logoSwitch.checked
                                         }
 
                                         ComboBox {
                                             id: defaultLogoCombo
                                             Layout.fillWidth: true
                                             model: backend ? backend.logoItems : []
+                                            visible: logoSwitch.checked
                                             Component.onCompleted: {
                                                 if (backend) currentIndex = backend.defaultLogoIndex
                                             }
@@ -402,6 +404,7 @@ ApplicationWindow {
                                         }
 
                                         RowLayout {
+                                            visible: logoSwitch.checked
                                             Layout.fillWidth: true
                                             Label {
                                                 text: window.tr("output_quality")

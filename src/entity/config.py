@@ -4,11 +4,11 @@ import yaml
 from PIL import Image
 from PIL import ImageFont
 
-from enums.constant import CUSTOM_VALUE
-from enums.constant import LOCATION_LEFT_BOTTOM
-from enums.constant import LOCATION_LEFT_TOP
-from enums.constant import LOCATION_RIGHT_BOTTOM
-from enums.constant import LOCATION_RIGHT_TOP
+from src.enums.constant import CUSTOM_VALUE
+from src.enums.constant import LOCATION_LEFT_BOTTOM
+from src.enums.constant import LOCATION_LEFT_TOP
+from src.enums.constant import LOCATION_RIGHT_BOTTOM
+from src.enums.constant import LOCATION_RIGHT_TOP
 
 
 class ElementConfig(object):

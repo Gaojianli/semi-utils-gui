@@ -4,18 +4,18 @@ from PIL import Image
 from PIL import ImageFilter
 from PIL import ImageOps
 
-from entity.config import Config
-from entity.image_container import ImageContainer
-from enums.constant import GRAY
-from enums.constant import TRANSPARENT
-from utils import append_image_by_side
-from utils import concatenate_image
-from utils import merge_images
-from utils import padding_image
-from utils import resize_image_with_height
-from utils import resize_image_with_width
-from utils import square_image
-from utils import text_to_image
+from src.entity.config import Config
+from src.entity.image_container import ImageContainer
+from src.enums.constant import GRAY
+from src.enums.constant import TRANSPARENT
+from src.utils import append_image_by_side
+from src.utils import concatenate_image
+from src.utils import merge_images
+from src.utils import padding_image
+from src.utils import resize_image_with_height
+from src.utils import resize_image_with_width
+from src.utils import square_image
+from src.utils import text_to_image
 
 printable = set(string.printable)
 
@@ -108,7 +108,7 @@ class WatermarkProcessor(ProcessorComponent):
         super().__init__(config)
         # 默认值
         self.logo_position = 'left'
-        self.logo_enable = True
+        self.logo_enable = config.has_logo_enabled()  # 从配置读取
         self.bg_color = '#ffffff'
         self.line_color = GRAY
         self.font_color_lt = '#212121'
@@ -173,7 +173,8 @@ class WatermarkProcessor(ProcessorComponent):
         right = padding_image(right, left.height - right.height, 'b')
 
         logo = config.load_logo(container.make)
-        if self.logo_enable:
+        # 动态读取配置中的 logo 开关状态
+        if config.has_logo_enabled():
             if self.is_logo_left():
                 # 如果 logo 在左边
                 line = LINE_TRANSPARENT.copy()

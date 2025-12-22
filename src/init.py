@@ -3,26 +3,26 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from entity.config import Config
-from entity.image_processor import BackgroundBlurProcessor
-from entity.image_processor import BackgroundBlurWithWhiteBorderProcessor
-from entity.image_processor import CustomWatermarkProcessor
-from entity.image_processor import DarkWatermarkLeftLogoProcessor
-from entity.image_processor import DarkWatermarkRightLogoProcessor
-from entity.image_processor import EmptyProcessor
-from entity.image_processor import MarginProcessor
-from entity.image_processor import PaddingToOriginalRatioProcessor
-from entity.image_processor import ProcessorComponent
-from entity.image_processor import PureWhiteMarginProcessor
-from entity.image_processor import ShadowProcessor
-from entity.image_processor import SimpleProcessor
-from entity.image_processor import SquareProcessor
-from entity.image_processor import WatermarkLeftLogoProcessor
-from entity.image_processor import WatermarkProcessor
-from entity.image_processor import WatermarkRightLogoProcessor
-from entity.menu import *
-from enums.constant import *
-from gen_video import generate_video
+from src.entity.config import Config
+from src.entity.image_processor import BackgroundBlurProcessor
+from src.entity.image_processor import BackgroundBlurWithWhiteBorderProcessor
+from src.entity.image_processor import CustomWatermarkProcessor
+from src.entity.image_processor import DarkWatermarkLeftLogoProcessor
+from src.entity.image_processor import DarkWatermarkRightLogoProcessor
+from src.entity.image_processor import EmptyProcessor
+from src.entity.image_processor import MarginProcessor
+from src.entity.image_processor import PaddingToOriginalRatioProcessor
+from src.entity.image_processor import ProcessorComponent
+from src.entity.image_processor import PureWhiteMarginProcessor
+from src.entity.image_processor import ShadowProcessor
+from src.entity.image_processor import SimpleProcessor
+from src.entity.image_processor import SquareProcessor
+from src.entity.image_processor import WatermarkLeftLogoProcessor
+from src.entity.image_processor import WatermarkProcessor
+from src.entity.image_processor import WatermarkRightLogoProcessor
+from src.entity.menu import *
+from src.enums.constant import *
+from src.gen_video import generate_video
 
 # 如果 logs 不存在，创建 logs
 Path('./logs').mkdir(parents=True, exist_ok=True)

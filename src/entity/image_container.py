@@ -9,13 +9,13 @@ from PIL import Image
 from PIL.Image import Transpose
 from dateutil import parser
 
-from entity.config import ElementConfig
-from enums.constant import *
-from utils import calculate_pixel_count
-from utils import extract_attribute
-from utils import extract_gps_info
-from utils import extract_gps_lat_and_long
-from utils import get_exif
+from src.entity.config import ElementConfig
+from src.enums.constant import *
+from src.utils import calculate_pixel_count
+from src.utils import extract_attribute
+from src.utils import extract_gps_info
+from src.utils import extract_gps_lat_and_long
+from src.utils import get_exif
 
 logger = logging.getLogger(__name__)
 
