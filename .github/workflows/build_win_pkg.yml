@@ -39,9 +39,12 @@ jobs:
 
     - name: Add Release Resource to Package
       run: |
-        Move-Item -Path "./input" -Destination "./dist/semi-utils"
-        Move-Item -Path "./logos" -Destination "./dist/semi-utils"
-        Move-Item -Path "./fonts" -Destination "./dist/semi-utils"
+        New-Item -ItemType Directory -Path "./dist/semi-utils" -Force
+        New-Item -ItemType Directory -Path "./dist/semi-utils/input" -Force
+        New-Item -ItemType Directory -Path "./dist/semi-utils/output" -Force
+        Move-Item -Path "./dist/semi-utils.exe" -Destination "./dist/semi-utils/semi-utils.exe"
+        Move-Item -Path "./logos" -Destination "./dist/semi-utils/logos"
+        Move-Item -Path "./fonts" -Destination "./dist/semi-utils/fonts"
         Move-Item -Path "./config.yaml" -Destination "./dist/semi-utils/config.yaml"
 
     - name: Create zip archive
