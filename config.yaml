@@ -18,7 +18,7 @@ global:
   white_margin:
     enable: true
     width: 3
-gui_language: en
+gui_language: zh
 layout:
   background_color: '#ffffff'
   elements:
@@ -57,7 +57,7 @@ logo:
       id: DJI
       path: ./logos/DJI.jpg
     empty:
-      id: 空
+      id: None
       path: ./logos/empty.png
     fujifilm:
       id: FUJIFILM
@@ -69,7 +69,7 @@ logo:
       id: HUAWEI
       path: ./logos/xmage.png
     leica:
-      id: leica
+      id: Leica
       path: ./logos/leica_logo.png
     nikon:
       id: NIKON

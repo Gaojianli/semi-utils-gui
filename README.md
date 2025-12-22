@@ -148,7 +148,7 @@ logo:
       id: HUAWEI
       path: ./logos/xmage.jpg
     leica:
-      id: leica
+      id: Leica
       path: ./logos/leica_logo.png
     nikon:
       id: NIKON

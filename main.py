@@ -26,7 +26,7 @@ from init import (
     PADDING_TO_ORIGINAL_RATIO_PROCESSOR,
     SIMPLE_PROCESSOR,
 )
-from utils import get_file_list
+from utils import get_file_list, get_exif
 from translations import TRANSLATIONS
 
 # 布局名称到翻译 key 的映射
@@ -501,13 +501,41 @@ class Backend(QObject):
             self.selectedFileIndexChanged.emit()
             self._schedule_preview_refresh()
 
+    def _get_file_info(self, file_path: Path) -> dict:
+        """获取文件信息（名称、拍摄时间、大小）"""
+        info = {
+            "name": file_path.name,
+            "datetime": "",
+            "size": ""
+        }
+        try:
+            # 获取文件大小
+            size_bytes = file_path.stat().st_size
+            if size_bytes < 1024:
+                info["size"] = f"{size_bytes} B"
+            elif size_bytes < 1024 * 1024:
+                info["size"] = f"{size_bytes / 1024:.1f} KB"
+            else:
+                info["size"] = f"{size_bytes / (1024 * 1024):.1f} MB"
+
+            # 获取拍摄时间
+            exif = get_exif(str(file_path))
+            if "DateTimeOriginal" in exif:
+                dt_str = exif["DateTimeOriginal"]
+                # 格式: "2023:01:01 12:00:00" -> "2023-01-01 12:00"
+                if len(dt_str) >= 16:
+                    info["datetime"] = dt_str[:10].replace(":", "-") + " " + dt_str[11:16]
+        except Exception:
+            pass
+        return info
+
     @Slot()
     def refreshFileList(self):
         """刷新文件列表"""
         input_dir = self._config.get_input_dir()
         if os.path.exists(input_dir):
             self._file_paths = get_file_list(input_dir)
-            self._file_list = [p.name for p in self._file_paths]
+            self._file_list = [self._get_file_info(p) for p in self._file_paths]
         else:
             self._file_paths = []
             self._file_list = []
@@ -533,7 +561,7 @@ class Backend(QObject):
             p = Path(path)
             if p not in self._file_paths:
                 self._file_paths.append(p)
-                self._file_list.append(p.name)
+                self._file_list.append(self._get_file_info(p))
 
         self.fileListChanged.emit()
         self.fileCountChanged.emit()
