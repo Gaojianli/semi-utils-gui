@@ -29,6 +29,13 @@ ApplicationWindow {
     Material.accent: Material.Teal
     Material.primary: Material.BlueGrey
 
+    // 窗口关闭时自动保存配置
+    onClosing: {
+        if (backend) {
+            backend.saveConfig()
+        }
+    }
+
     // 文件选择对话框
     FolderDialog {
         id: inputFolderDialog
@@ -74,7 +81,7 @@ ApplicationWindow {
 
         // ==================== 左侧面板 ====================
         Pane {
-            Layout.preferredWidth: 400
+            Layout.preferredWidth: 460
             Layout.fillHeight: true
             Material.elevation: 2
             padding: 0
@@ -88,11 +95,14 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Material.elevation: 1
                     Material.background: Material.primary
-                    padding: 12
+                    leftPadding: 12
+                    rightPadding: 16
+                    topPadding: 12
+                    bottomPadding: 12
 
                     RowLayout {
                         anchors.fill: parent
-                        spacing: 8
+                        spacing: 4
 
                         TabBar {
                             id: mainTabBar
@@ -104,12 +114,14 @@ ApplicationWindow {
                                 font.pixelSize: 16
                                 font.bold: mainTabBar.currentIndex === 0
                                 Material.foreground: "white"
+                                implicitWidth: Math.max(120, contentItem.implicitWidth + leftPadding + rightPadding)
                             }
                             TabButton {
                                 text: window.tr("settings")
                                 font.pixelSize: 16
                                 font.bold: mainTabBar.currentIndex === 1
                                 Material.foreground: "white"
+                                implicitWidth: Math.max(120, contentItem.implicitWidth + leftPadding + rightPadding)
                             }
                         }
 
@@ -119,6 +131,7 @@ ApplicationWindow {
                             text: "Language:"
                             color: "white"
                             font.pixelSize: 12
+                            Layout.rightMargin: 4
                         }
 
                         ComboBox {
@@ -132,8 +145,9 @@ ApplicationWindow {
                                     backend.languageIndex = index
                                 }
                             }
-                            implicitWidth: 100
+                            implicitWidth: 120
                             implicitHeight: 36
+                            Layout.rightMargin: 8
 
                             Connections {
                                 target: backend
@@ -601,19 +615,6 @@ ApplicationWindow {
                             RowLayout {
                                 anchors.fill: parent
                                 spacing: 8
-
-                                Button {
-                                    Layout.fillWidth: true
-                                    text: window.tr("save_config")
-                                    Material.background: Material.Teal
-                                    Material.foreground: "white"
-                                    onClicked: {
-                                        if (backend) {
-                                            backend.saveConfig()
-                                            savedSnackbar.open()
-                                        }
-                                    }
-                                }
 
                                 Button {
                                     Layout.fillWidth: true

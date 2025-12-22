@@ -39,13 +39,29 @@ PATTERN = re.compile(r"(\d+)\.")  # 匹配小数
 
 
 def get_datetime(exif) -> datetime:
-    dt = datetime.now()
-    try:
-        dt = parser.parse(extract_attribute(exif, ExifId.DATETIME.value,
-                                            default_value=str(datetime.now())))
-    except ValueError as e:
-        logger.info(f'Error: 时间格式错误：{extract_attribute(exif, ExifId.DATETIME.value)}')
-    return dt
+    """
+    获取照片的拍摄时间
+    优先级：EXIF DateTimeOriginal > 文件修改时间 > 当前时间
+    """
+    dt = None
+
+    # 尝试从 EXIF 获取拍摄时间
+    datetime_str = extract_attribute(exif, ExifId.DATETIME.value, default_value='')
+    if datetime_str:
+        try:
+            # EXIF 标准时间格式: "YYYY:MM:DD HH:MM:SS"
+            dt = datetime.strptime(datetime_str, '%Y:%m:%d %H:%M:%S')
+            return dt
+        except ValueError:
+            # 如果标准格式解析失败，尝试其他格式
+            try:
+                dt = parser.parse(datetime_str)
+                return dt
+            except Exception as e:
+                logger.info(f'Error: 时间格式错误：{datetime_str}')
+
+    # 最后使用当前时间
+    return datetime.now()
 
 
 def get_focal_length(exif):

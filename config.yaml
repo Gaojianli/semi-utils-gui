@@ -41,7 +41,7 @@ layout:
       name: Param
   logo_enable: false
   logo_position: left
-  type: watermark_right_logo
+  type: dark_watermark_left_logo
 logo:
   default:
     id: ''
