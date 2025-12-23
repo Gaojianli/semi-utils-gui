@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import yaml
 from PIL import Image
@@ -9,6 +10,8 @@ from src.enums.constant import LOCATION_LEFT_BOTTOM
 from src.enums.constant import LOCATION_LEFT_TOP
 from src.enums.constant import LOCATION_RIGHT_BOTTOM
 from src.enums.constant import LOCATION_RIGHT_TOP
+
+DEFAULT_CONFIG_FILE = 'config.yaml.default'
 
 
 class ElementConfig(object):
@@ -47,6 +50,7 @@ class Config(object):
 
     def __init__(self, path):
         self._path = path
+        self._ensure_config_exists()
         with open(self._path, 'r', encoding='utf-8') as f:
             self._data = yaml.safe_load(f)
         self._logos = {}
@@ -58,6 +62,15 @@ class Config(object):
         self.bg_color = self._data['layout']['background_color'] \
             if 'background_color' in self._data['layout'] \
             else '#ffffff'
+
+    def _ensure_config_exists(self):
+        """检查配置文件是否存在，不存在则从默认配置文件复制"""
+        if not os.path.exists(self._path):
+            if os.path.exists(DEFAULT_CONFIG_FILE):
+                shutil.copy(DEFAULT_CONFIG_FILE, self._path)
+                print(f"配置文件 {self._path} 不存在，已从 {DEFAULT_CONFIG_FILE} 复制默认配置。")
+            else:
+                raise FileNotFoundError(f"配置文件 {self._path} 和默认配置文件 {DEFAULT_CONFIG_FILE} 都不存在。")
 
     def get(self, key):
         if key in self._data:
