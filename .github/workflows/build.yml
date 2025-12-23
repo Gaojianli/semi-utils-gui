@@ -1,0 +1,19 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    uses: ./build_win_pkg.yml
+    with:
+      version: dev
+
+  build-macos:
+    uses: ./build_mac_pkg.yml
+    with:
+      version: dev

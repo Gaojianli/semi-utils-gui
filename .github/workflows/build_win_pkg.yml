@@ -1,9 +1,18 @@
-name: Build Windows Release Package
+name: Build Windows Package
 
 on:
-  release:
-    types:
-      - published
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0)'
+        required: false
+        default: 'dev'
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: false
+        default: 'dev'
 
 jobs:
   build:
@@ -12,11 +21,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v6
-
-    - name: Get version from tag
-      id: get_version
-      shell: bash
-      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
     - name: Set up Python
       uses: actions/setup-python@v6
@@ -29,13 +33,10 @@ jobs:
         enable-cache: true
 
     - name: Install Dependencies
-      run: |
-        uv sync
-        uv add pyinstaller
+      run: uv sync
 
     - name: Build Executable
-      run: |
-        uv run pyinstaller specs/build_win_pkg.spec
+      run: uv run pyinstaller specs/build_win_pkg.spec
 
     - name: Add Release Resource to Package
       run: |
@@ -48,11 +49,11 @@ jobs:
 
     - name: Create zip archive
       run: |
-        Compress-Archive -Path "./dist/semi-utils/*" -DestinationPath "./dist/semi-utils-${{ steps.get_version.outputs.VERSION }}-win-amd64.zip"
+        Compress-Archive -Path "./dist/semi-utils/*" -DestinationPath "./dist/semi-utils-${{ inputs.version }}-win-amd64.zip"
 
-    - name: Upload to Release
-      uses: softprops/action-gh-release@v2
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
       with:
-        files: ./dist/semi-utils-${{ steps.get_version.outputs.VERSION }}-win-amd64.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: semi-utils-${{ inputs.version }}-win-amd64
+        path: ./dist/semi-utils-${{ inputs.version }}-win-amd64.zip
+        retention-days: 7

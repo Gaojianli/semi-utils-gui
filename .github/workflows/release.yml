@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build-windows:
+    uses: ./.github/workflows/build_win_pkg.yml
+    with:
+      version: ${{ github.event.release.tag_name }}
+
+  build-macos:
+    uses: ./.github/workflows/build_mac_pkg.yml
+    with:
+      version: ${{ github.event.release.tag_name }}
+
+  upload-release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        pattern: semi-utils-${{ github.event.release.tag_name }}-*
+        merge-multiple: false
+
+    - name: List artifacts
+      run: find artifacts -type f
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: artifacts/**/*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
