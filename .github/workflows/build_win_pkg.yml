@@ -45,7 +45,7 @@ jobs:
         Move-Item -Path "./dist/semi-utils.exe" -Destination "./dist/semi-utils/semi-utils.exe"
         Move-Item -Path "./logos" -Destination "./dist/semi-utils/logos"
         Move-Item -Path "./fonts" -Destination "./dist/semi-utils/fonts"
-        Move-Item -Path "./config.yaml" -Destination "./dist/semi-utils/config.yaml"
+        Move-Item -Path "./config.yaml.default" -Destination "./dist/semi-utils/config.yaml"
 
     - name: Create zip archive
       run: |

@@ -11,3 +11,4 @@ dist
 logs
 .vscode/
 .claude
+config.yaml
