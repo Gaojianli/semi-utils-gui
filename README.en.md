@@ -28,7 +28,10 @@ Thanks to the original developer [leslievan](https://github.com/leslievan/semi-u
 
 ---
 
-### macOS/Linux
+### macOS
+- Click [Release](https://github.com/Gaojianli/semi-utils-gui/releases) to download the zip package directly, extract it, and double-click `Semi-Utils.app` to launch
+
+### Linux
 
 #### Using git
 
@@ -40,13 +43,8 @@ Thanks to the original developer [leslievan](https://github.com/leslievan/semi-u
   # Use git to clone the code locally, e.g., ~/semi-utils. Replace the path in the command if you want to download to a different location
   git clone --depth 1 https://github.com/Gaojianli/semi-utils-gui.git ~/semi-utils
   cd ~/semi-utils
-  chmod +x install.sh
-  ./install.sh
+  uv sync
   ```
-
-  > You can press Command+Space to open Spotlight search, then type `Terminal`.
-  >
-  > If the command fails, refer to [FAQ](#faq).
 
 - Copy the images you want to watermark to the `~/semi-utils/input` folder
 
@@ -205,7 +203,7 @@ logo:
 
 ## FAQ
 
-### `command not found` when running `pip install`
+### `command not found` when running `uv sync`
 
 **This is likely because Python3 is not installed.** You can install Python3 using one of the following methods:
 
@@ -216,7 +214,7 @@ logo:
    - If you already have `brew` installed, open terminal and enter the following command to install Python3:
 
      ```shell
-     brew install python3
+     brew install python3 uv
      ```
 
      If this command shows `command not found`, it means you don't have `brew` installed. Go to the next step.
@@ -235,7 +233,7 @@ logo:
 
 2. Install using dmg package
 
-   You can download the Python3 installer from the [Python official website](https://www.python.org/downloads/macos/). Choose any version under Stable Release, `3.10.11` is recommended. Then open the downloaded installer and follow the prompts to install.
+   You can download the Python3 installer from the [Python official website](https://www.python.org/downloads/macos/). Choose any version under Stable Release, `3.14` is recommended. Then open the downloaded installer and follow the prompts to install.
 
 **Verify Installation**
 
@@ -249,8 +247,7 @@ This command will return the installed Python3 version number.
 
 ## Special Thanks
 
-[Claude](https://claude.com/product/claude-code) for helping to create the gui.
-
+[Claude](https://claude.com/product/claude-code) for creating the GUI.
 
 ## License
 

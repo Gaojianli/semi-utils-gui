@@ -29,7 +29,10 @@
 
 ---
 
-### macOS/Linux
+### macOS
+- 点击[Release](https://github.com/Gaojianli/semi-utils-gui/releases) 可直接下载压缩包，解压，双击`Semi-Utils.app`启动即可
+
+### Linux
 
 #### 使用 git
 
@@ -41,13 +44,8 @@
   # 使用 git 将代码下载到本地，比如 ~/semi-utils，如果要下载到其他路径替换掉下面命令中的路径即可
   git clone --depth 1 https://github.com/Gaojianli/semi-utils-gui.git ~/semi-utils
   cd ~/semi-utils
-  chmod +x install.sh
-  ./install.sh
+  uv sync
   ```
-
-  > 你可以按下 command+空格键，打开 Spotlight 搜索栏，在搜索栏中输入 `终端` 即可。
-  >
-  > 如果命令运行出错可以参考 [常见问题](#常见问题)。
 
 - 将需要添加水印的图片复制到 `~/semi-utils/input` 文件夹中
 
@@ -206,7 +204,7 @@ logo:
 
 ## 常见问题
 
-### 运行 `pip install` 时提示 `command not found`
+### 运行 `uv sync` 时提示 `command not found`
 
 **可能是因为没有安装 Python3**，可以通过以下几种方式安装 Python3。
 
@@ -217,7 +215,7 @@ logo:
    - 如果你已经安装了 `brew`，打开终端并输入以下命令来安装 Python3：
 
      ```shell
-     brew install python3
+     brew install python3 uv
      ```
 
      如果这条命令提示 `command not found`，代表你没有安装 `brew`，跳转下一步。
@@ -236,7 +234,7 @@ logo:
 
 2. 使用 dmg 包安装
 
-   你可以从 [Python 官网](https://www.python.org/downloads/macos/) 下载 Python3 的安装包，选择 Stable Release 下的任一版本即可，推荐 `3.10.11`，然后打开下载好的安装包按照提示安装即可。
+   你可以从 [Python 官网](https://www.python.org/downloads/macos/) 下载 Python3 的安装包，选择 Stable Release 下的任一版本即可，推荐 `3.14`，然后打开下载好的安装包按照提示安装即可。
 
 **验证安装**
 
