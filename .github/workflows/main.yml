@@ -32,7 +32,7 @@ jobs:
 
     - name: Build Executable
       run: |
-        uv run pyinstaller main.spec
+        uv run pyinstaller specs/main.spec
 
     - name: Add Release Resource to Package
       run: |

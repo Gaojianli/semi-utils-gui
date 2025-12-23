@@ -1,0 +1,53 @@
+name: Build macOS Release Package
+
+on:
+  release:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        arch_name: [arm64, x86_64]
+        include:
+          - arch_name: arm64
+            runner: macos-latest
+          - arch_name: x86_64
+            runner: macos-latest-large
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
+
+    - name: Install Dependencies
+      run: |
+        uv sync
+        uv add pyinstaller
+
+    - name: Build App Bundle
+      run: |
+        uv run pyinstaller specs/build_mac_pkg.spec
+    - name: Create zip archive
+      run: |
+        cd ./dist && zip -r "semi-utils-${{ steps.get_version.outputs.VERSION }}-mac-${{ matrix.arch_name }}.zip" Semi-Utils.app
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ./dist/semi-utils-${{ steps.get_version.outputs.VERSION }}-mac-${{ matrix.arch_name }}.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

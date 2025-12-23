@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 
 import yaml
 from PIL import Image
@@ -11,7 +12,18 @@ from src.enums.constant import LOCATION_LEFT_TOP
 from src.enums.constant import LOCATION_RIGHT_BOTTOM
 from src.enums.constant import LOCATION_RIGHT_TOP
 
-DEFAULT_CONFIG_FILE = 'config.yaml.default'
+DEFAULT_CONFIG_FILENAME = 'config.yaml.default'
+
+
+def get_resource_path(filename):
+    """获取资源文件路径，支持 PyInstaller 打包后的环境"""
+    if getattr(sys, 'frozen', False):
+        # 打包后的环境，资源在 _MEIPASS 目录
+        base_path = sys._MEIPASS
+    else:
+        # 开发环境，资源在项目根目录
+        base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return os.path.join(base_path, filename)
 
 
 class ElementConfig(object):
@@ -66,11 +78,12 @@ class Config(object):
     def _ensure_config_exists(self):
         """检查配置文件是否存在，不存在则从默认配置文件复制"""
         if not os.path.exists(self._path):
-            if os.path.exists(DEFAULT_CONFIG_FILE):
-                shutil.copy(DEFAULT_CONFIG_FILE, self._path)
-                print(f"配置文件 {self._path} 不存在，已从 {DEFAULT_CONFIG_FILE} 复制默认配置。")
+            default_config_path = get_resource_path(DEFAULT_CONFIG_FILENAME)
+            if os.path.exists(default_config_path):
+                shutil.copy(default_config_path, self._path)
+                print(f"配置文件 {self._path} 不存在，已从 {default_config_path} 复制默认配置。")
             else:
-                raise FileNotFoundError(f"配置文件 {self._path} 和默认配置文件 {DEFAULT_CONFIG_FILE} 都不存在。")
+                raise FileNotFoundError(f"配置文件 {self._path} 和默认配置文件 {default_config_path} 都不存在。")
 
     def get(self, key):
         if key in self._data:
@@ -87,6 +100,13 @@ class Config(object):
     def set(self, key, value):
         self._data[key] = value
 
+    def _get_asset_path(self, relative_path):
+        """获取资源文件的实际路径（支持打包环境）"""
+        # 移除开头的 ./
+        if relative_path.startswith('./'):
+            relative_path = relative_path[2:]
+        return get_resource_path(relative_path)
+
     def load_logo(self, make) -> Image.Image:
         """
         根据厂商获取 logo
@@ -101,10 +121,11 @@ class Config(object):
             if m['id'] == '':
                 pass
             if m['id'].lower() in make.lower():
-                logo = Image.open(m['path'])
+                logo_path = self._get_asset_path(m['path'])
+                logo = Image.open(logo_path)
                 self._logos[make] = logo
                 return logo
-        logo_path = self._data['logo']['default']['path']
+        logo_path = self._get_asset_path(self._data['logo']['default']['path'])
         logo = Image.open(logo_path)
         self._logos[make] = logo
         return logo
@@ -125,16 +146,20 @@ class Config(object):
         return self._data['base']['quality']
 
     def get_alternative_font(self):
-        return ImageFont.truetype(self._data['base']['alternative_font'], self.get_font_size())
+        font_path = self._get_asset_path(self._data['base']['alternative_font'])
+        return ImageFont.truetype(font_path, self.get_font_size())
 
     def get_alternative_bold_font(self):
-        return ImageFont.truetype(self._data['base']['alternative_bold_font'], self.get_bold_font_size())
+        font_path = self._get_asset_path(self._data['base']['alternative_bold_font'])
+        return ImageFont.truetype(font_path, self.get_bold_font_size())
 
     def get_font(self):
-        return ImageFont.truetype(self._data['base']['font'], self.get_font_size())
+        font_path = self._get_asset_path(self._data['base']['font'])
+        return ImageFont.truetype(font_path, self.get_font_size())
 
     def get_bold_font(self):
-        return ImageFont.truetype(self._data['base']['bold_font'], self.get_bold_font_size())
+        font_path = self._get_asset_path(self._data['base']['bold_font'])
+        return ImageFont.truetype(font_path, self.get_bold_font_size())
 
     def get_font_size(self):
         font_size = self._data['base']['font_size']

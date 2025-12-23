@@ -2,8 +2,6 @@ name: Build Windows Release Package
 
 on:
   release:
-    types:
-      - published
 
 jobs:
   build:
@@ -35,7 +33,7 @@ jobs:
 
     - name: Build Executable
       run: |
-        uv run pyinstaller build_win_pkg.spec
+        uv run pyinstaller specs/build_win_pkg.spec
 
     - name: Add Release Resource to Package
       run: |
