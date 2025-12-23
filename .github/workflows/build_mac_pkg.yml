@@ -23,7 +23,7 @@ jobs:
           - arch_name: arm64
             runner: macos-latest
           - arch_name: x86_64
-            runner: macos-13
+            runner: macos-15-intel
 
     steps:
     - name: Checkout
