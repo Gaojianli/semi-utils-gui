@@ -2,6 +2,8 @@ name: Build macOS Release Package
 
 on:
   release:
+    types:
+      - published
 
 jobs:
   build:

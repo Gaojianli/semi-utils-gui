@@ -2,6 +2,8 @@ name: Build Windows Release Package
 
 on:
   release:
+    types:
+      - published
 
 jobs:
   build:
