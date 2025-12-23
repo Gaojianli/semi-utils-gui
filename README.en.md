@@ -19,6 +19,7 @@ Thanks to the original developer [leslievan](https://github.com/leslievan/semi-u
 > **Quick Steps**
 >
 > ![](images/usage.png)
+> ![](images/usage2.png)
 
 ### Windows
 

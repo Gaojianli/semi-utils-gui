@@ -20,6 +20,7 @@
 > **简要步骤**
 >
 > ![](images/usage.png)
+> ![](images/usage2.png)
 
 ### Windows
 
