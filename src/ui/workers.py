@@ -75,10 +75,7 @@ class PreviewWorker(QThread):
                 return
 
             # 处理图片
-            container = ImageContainer(Path(self.file_path))
-            container.is_use_equivalent_focal_length(
-                self.config.use_equivalent_focal_length()
-            )
+            container = ImageContainer(Path(self.file_path), self.config.use_equivalent_focal_length())
             processor_chain.process(container)
 
             if self._cancelled:
@@ -147,10 +144,7 @@ class ProcessWorker(QThread):
                     break
 
                 try:
-                    container = ImageContainer(source_path)
-                    container.is_use_equivalent_focal_length(
-                        self.config.use_equivalent_focal_length()
-                    )
+                    container = ImageContainer(source_path, self.config.use_equivalent_focal_length())
                     processor_chain.process(container)
 
                     target_path = Path(self.config.get_output_dir()).joinpath(
