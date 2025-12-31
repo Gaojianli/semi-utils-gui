@@ -50,7 +50,7 @@ jobs:
         cd ./dist && zip -r "semi-utils-${{ inputs.version }}-mac-${{ matrix.arch_name }}.zip" Semi-Utils.app
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: semi-utils-${{ inputs.version }}-mac-${{ matrix.arch_name }}
         path: ./dist/semi-utils-${{ inputs.version }}-mac-${{ matrix.arch_name }}.zip
